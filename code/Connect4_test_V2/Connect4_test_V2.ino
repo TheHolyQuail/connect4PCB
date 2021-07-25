@@ -8,6 +8,9 @@ _____________________________________________________
  Ain2 (D 4) PB4  3|    |6  PB1 (D 1) pwm1
             GND  4|    |5  PB0 (D 0) pwm0
                   +----+
+ In this project: 
+ - Ain3 is used to take all button inputs using alalog read.
+ - PB0 is used to control the WS2813 LEDs using the FAB_LED library.
 _____________________________________________________
 The Button Circuit:
  
@@ -38,7 +41,7 @@ July 24, 2021
 ws2812b<D,0>  strip;
 
   // How many pixels to control
-const uint8_t numPixels = 49;
+const uint8_t numPixels = 43;
 
   // How bright the LEDs will be (max 255)
 const uint8_t maxBrightness = 16;
@@ -79,7 +82,15 @@ int ButtonVal;
 // connect four variables //////////////////////////////////////////////////////
 // I use uint8_t because it is only one byte and all values will be small unsigned integers.
   // Need to set up with all zeros. Then a red piece can be 1 and a blue piece can be 2. (array[row][column])
-uint8_t gameBoard[6][7];
+uint8_t gameBoard[7][6] = {
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0}   
+};
   // The position from left to right of the piece currently waiting to drop (range: 0 to 6).
 uint8_t dropPosition = 0;
   // The status of the game. Also controls the color of the status LED which is LED #43.
