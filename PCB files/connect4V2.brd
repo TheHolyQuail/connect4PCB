@@ -817,7 +817,7 @@ design rules under a new name.</description>
 <attribute name="STANDARD" value="Manufacturer Recommendations" x="133.63" y="48.94" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="43.020940625" y="49.936709375" size="1.27206875" layer="27"/>
 </element>
-<element name="R5" library="Resistor" package="RESAD724W46L381D178B" package3d_urn="urn:adsk.eagle:package:16378561/2" value="100K" x="94.634" y="22" smashed="yes">
+<element name="R5" library="Resistor" package="RESAD724W46L381D178B" package3d_urn="urn:adsk.eagle:package:16378561/2" value="10K" x="94.634" y="22" smashed="yes">
 <attribute name="CATEGORY" value="Resistor" x="94.634" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="MANUFACTURER" value="" x="94.634" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="94.634" y="22" size="1.778" layer="27" display="off"/>
@@ -856,7 +856,7 @@ design rules under a new name.</description>
 <attribute name="SOURCELIBRARY" value="C&amp;K_2019-11-15" x="94" y="32" size="1.778" layer="27" display="off"/>
 <attribute name="VENDOR" value="C&amp;K" x="94" y="32" size="1.778" layer="27" display="off"/>
 </element>
-<element name="R7" library="Resistor" package="RESAD724W46L381D178B" package3d_urn="urn:adsk.eagle:package:16378561/2" value="390" x="94.734" y="43" smashed="yes" rot="R270">
+<element name="R7" library="Resistor" package="RESAD724W46L381D178B" package3d_urn="urn:adsk.eagle:package:16378561/2" value="330" x="94.734" y="43" smashed="yes" rot="R270">
 <attribute name="CATEGORY" value="Resistor" x="94.734" y="43" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MANUFACTURER" value="" x="94.734" y="43" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="" x="94.734" y="43" size="1.778" layer="27" rot="R270" display="off"/>

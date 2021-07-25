@@ -1238,10 +1238,10 @@ integrated light source </description>
 <part name="R2" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="2.2K"/>
 <part name="U3" library="SMD_Button" library_urn="urn:adsk.wipprod:fs.file:vf.iuqlLaJzROq_oPAzu7-Wkw" deviceset="PTS526_SK15_SMTR2_LFS" device="SMT_FS-M"/>
 <part name="R4" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="10K"/>
-<part name="R5" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="100K"/>
+<part name="R5" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="10K"/>
 <part name="R6" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="470"/>
 <part name="U48" library="SMD_Button" library_urn="urn:adsk.wipprod:fs.file:vf.iuqlLaJzROq_oPAzu7-Wkw" deviceset="PTS526_SK15_SMTR2_LFS" device="SMT_FS-M"/>
-<part name="R7" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="390"/>
+<part name="R7" library="Resistor" deviceset="R-US" device="AXIAL-7.2MM-PITCH" package3d_urn="urn:adsk.eagle:package:16378561/2" technology="_" value="330"/>
 <part name="U$1" library="MICROUSB-5P-FEMALE-AB" library_urn="urn:adsk.wipprod:fs.file:vf.Rhs5KJ4ZRwm7u_a9Xeok_Q" deviceset="MICROUSB-5P-FEMALE-AB" device=""/>
 </parts>
 <sheets>
