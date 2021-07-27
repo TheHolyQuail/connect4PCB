@@ -48,8 +48,6 @@ const uint8_t maxBrightness = 16;
 
   // The pixel array to display
 grb  pixels[numPixels] = {};
-  
-//char activeColor = 0;
 
   // whether the LED array needs to be updated
 bool LEDchange = true;
@@ -98,10 +96,17 @@ uint8_t gameBoard[6][7] = {
 };
   // The position from left to right of the piece currently waiting to drop (range: 0 to 6).
 uint8_t dropPosition = 0;
-  // The status of the game. Also controls the color of the status LED which is LED #43.
-uint8_t gameStatus = 0;
+  // The status of the game. 0 = error, 1 = player 1 turn, 2 = player 2 turn, 3 = player 1 win, 4 = player 2 win.
+  // Also controls the color of the status LED which is LED #43.
+uint8_t gameStatus = 1;
   // Stores the game defined state of the button input.
 uint8_t buttonState = 0; // 0 = no input, 1 = up arrow, 2 = down arrow, 3 = left arrow, 4 = right arrow
+  // Whether the hanging piece is showing or hidden (for a blink animation).
+bool hangBlinkOn = true;
+  // Timer for the hanging piece blinking animation.
+long hangBlinkTimer = 0;
+  // blink duration.
+uint16_t blinkLen = 800;
 ////////////////////////////////////////////////////////////////////////////////
 bool pressedTest = false;
 
@@ -120,7 +125,8 @@ void loop()
   {
     ButtonCheck();
     timer = millis();
-  } else if (millis() > timer + 500) // If the debounce of 50 milliseconds has been reached
+      // If the debounce of 500 milliseconds has been reached.
+  } else if (millis() > timer + 500)
   {
     // debounce has been met so it is reset.   
     buttonDebounce = true;
@@ -137,33 +143,30 @@ void loop()
       buttonTaskComplete();
       break;
     case 2:
-//        // Write the pixel array green
-//      updateColors(0, maxBrightness, 0);
         // drop the current hanging piece
       dropPiece();
         // task complete
       buttonTaskComplete();
       break;
     case 3:
-//      // Write the pixel array blue
-//      updateColors(0, 0, maxBrightness);
         // If the hanging piece is not at the leftmost side
         // move hanging piece to the left.
       if (dropPosition > 0)
       {
+          // Move hanging piece to the right.
         dropPosition -= 1;
+        LEDchange = true; // LEDs have changed
       }
         // task complete
       buttonTaskComplete();
       break;
     case 4:
-//        // Write the pixel array yellow
-//      updateColors(maxBrightness, maxBrightness, maxBrightness);
-        // If the hanging piece is not at the rightmost side
-        // move hanging piece to the right.
+        // If the hanging piece is not at the rightmost side.
       if (dropPosition < 6)
       {
+          // Move hanging piece to the right.
         dropPosition += 1;
+        LEDchange = true; // LEDs have changed
       }
         // task complete
       buttonTaskComplete();
@@ -174,14 +177,64 @@ void loop()
       LEDchange = true; // LEDs have changed
         // task complete
       buttonTaskComplete();
+      break;
+  }
+  ///////////////////////////////////////////////////////
+  // hanging piece blink handling ///////////////////////
+    // If it's been blinkLen milliseconds since last blink.
+  if (millis() > hangBlinkTimer + blinkLen) 
+  {
+    // Set hangBlinkOn to its inverse causing it to blink.   
+    hangBlinkOn = !hangBlinkOn;
+    hangBlinkTimer = millis();
+    LEDchange = true; // LEDs have changed
   }
   ///////////////////////////////////////////////////////
   // game draw handling /////////////////////////////////
     // if a change has been made update the display
   if (LEDchange)
   {
-      // update the LED control array
+       // Update the LED control array with game board.
     convertGameToLightList();
+      // Update the hanging piece. Lights up the hanging LED in it's current spot.
+      // (Note: haning LED is not represented on the game board)
+    if(hangBlinkOn)
+    {
+      if(gameStatus == 1)
+      {
+        pixels[dropPosition].r = maxBrightness;
+        pixels[dropPosition].g = 0;
+        pixels[dropPosition].b = 0;
+      } else if (gameStatus == 2)
+      {
+        pixels[dropPosition].r = 0;
+        pixels[dropPosition].g = 0;
+        pixels[dropPosition].b = maxBrightness;
+      }
+    } else 
+    {
+      pixels[dropPosition].r = 0;
+      pixels[dropPosition].g = maxBrightness/2;
+      pixels[dropPosition].b = 0;
+    }
+//      // Update status LED.
+//      // Controls color of LED 43.
+    if(gameStatus == 1)
+    {
+      pixels[42].r = maxBrightness;
+      pixels[42].g = 0;
+      pixels[42].b = 0;
+    } else if (gameStatus == 2)
+    {
+      pixels[42].r = 0;
+      pixels[42].g = 0;
+      pixels[42].b = maxBrightness;
+    } else 
+    {
+      pixels[42].r = 0;
+      pixels[42].g = maxBrightness;
+      pixels[42].b = 0;
+    }
       // Display the pixels on the LED strip
     strip.sendPixels(numPixels, pixels);
       // reset change
@@ -189,7 +242,11 @@ void loop()
   }
   ///////////////////////////////////////////////////////
 }
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                              Functions                                     //
+//
+////////////////////////////////////////////////////////////////////////////////
 // code run after a button activated task is completed /////////////////////////
 void buttonTaskComplete()
 {
@@ -198,18 +255,57 @@ void buttonTaskComplete()
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+// update the haning piece visual representation ///////////////////////////////
+//void hangingHandler()
+//{
+//    // Turn of any ghost hanging LEDs at previous position.
+//  if (dropPosition != previousDropPosition)
+//  {
+//      // Set previous srop position to 0.
+//    gameBoard[0][previousDropPosition] = 0;
+//      // Set previous drop position to current drop position.
+//    previousDropPosition = dropPosition;
+//  }
+//    // lights up the hanging LED in it's current spot
+//  if(hangBlinkOn)
+//  {
+//    if(gameStatus == 1)
+//    {
+//      gameBoard[0][dropPosition] = 1;
+//    } else if (gameStatus == 2)
+//    {
+//      gameBoard[0][dropPosition] = 2;
+//    }
+//  } else {
+//    gameBoard[0][dropPosition] = 0;
+//  }
+//}
+////////////////////////////////////////////////////////////////////////////////
+
 // drops hanging piece /////////////////////////////////////////////////////////
 void dropPiece()
 {
-//  gameBoard[row][column]
-//  dropPosition
     // For each row checks if there is a piece in the colum of the hanging piece.
     // When a piece is found (or the bottom is reached) the hanging piece is placed in the lowest open spot.
   for(uint8_t i = 5; i >= 0; i--) // looping through rows
   {
-    if (gameBoard[i][dropPosition] == 0)
+      // If the open spot closest to the bottom has been found or if the top is the only option.
+    if (gameBoard[i][dropPosition] == 0 || i == 0)
     {
-      gameBoard[i][dropPosition] = 1; /////////////////////// need to change to be based on the game status /////////////////////////////////
+      if (gameStatus == 1)
+      {
+        gameBoard[i][dropPosition] = 1;
+        gameStatus = 2;
+      } else if (gameStatus == 2)
+      {
+        gameBoard[i][dropPosition] = 2;
+        gameStatus = 1;
+      }
+      if (i == 0)
+      {
+        moveHangingPiece();
+      }
+      // exit
       break;
     }
   }
@@ -217,6 +313,26 @@ void dropPiece()
   LEDchange = true; // LEDs have changed
 }
 ////////////////////////////////////////////////////////////////////////////////
+
+// move hanging piece //////////////////////////////////////////////////////////
+void moveHangingPiece()
+{
+    // Find an open spot to put the hanging piece.
+  for(uint8_t j = 0; j < 7; j++)
+  {
+      // Set the new dropPossition if it is open.
+    if (gameBoard[0][j] == 0)
+    {
+       dropPosition = j;
+       break;
+    }
+      // If not even the last position is open, then reset the game.
+    if (j == 6)
+    {
+      resetGame();
+    }
+  }
+}
 
 // Sets the array (aka all LEDs) to specified color ////////////////////////////
 void convertGameToLightList()
@@ -300,5 +416,10 @@ void resetGame()
       gameBoard[i][ii] = 0;
     }
   }
+    // Reset the hanging piece.
+  dropPosition = 0;
+  hangBlinkOn = true;
+    // Start player 1's turn.
+  gameStatus = 1;
 }
 ////////////////////////////////////////////////////////////////////////////////
