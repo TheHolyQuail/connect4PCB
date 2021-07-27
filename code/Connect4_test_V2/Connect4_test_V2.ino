@@ -77,6 +77,8 @@ int debounce_count = 50;
 int current_state = 0;
   // Stores the current analog value on the button input pin.
 int ButtonVal;
+  // whether the code is ready for a new button input
+bool buttonDebounce = true;
 ////////////////////////////////////////////////////////////////////////////////
 
 // connect four variables //////////////////////////////////////////////////////
@@ -89,12 +91,14 @@ uint8_t gameBoard[7][6] = {
   {0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0}   
+  {0, 0, 0, 0, 0, 0}
 };
   // The position from left to right of the piece currently waiting to drop (range: 0 to 6).
 uint8_t dropPosition = 0;
   // The status of the game. Also controls the color of the status LED which is LED #43.
 uint8_t gameStatus = 0;
+  // Stores the game defined state of the button input.
+uint8_t buttonState = 0; // 0 = no input, 1 = up arrow, 2 = down arrow, 3 = left arrow, 4 = right arrow
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -106,73 +110,80 @@ void setup()
 
 void loop()
 {
-   // If we have gone on to the next millisecond
-  if (millis() != timer)
+    // button press handling //////////////////////////////////
+  if (millis() != timer && buttonDebounce) // If we have gone on to the next millisecond and have no debounce needs.
   {
-//    // check analog pin for the button value and save it to ButtonVal
-//    ButtonVal = analogRead(analogpin);
-//    if(ButtonVal == current_state && counter > 0)
-//    { 
-//      counter--;
-//    }
-//    if(ButtonVal != current_state)
-//    {
-//      counter++;
-//    }
-//    // If ButtonVal has shown the same value for long enough let's switch it
-//    if (counter >= debounce_count)
-//    {
-//      counter = 0;
-//      current_state = ButtonVal;
-//      //Checks which button or button combo has been pressed
-//      if (ButtonVal > 0)
-//      {
-//        ButtonCheck();
-//      }
-//    }
-    
     ButtonCheck();
     timer = millis();
-  }
-
-  if(activeColor == 0)
+  } else if (millis() > timer + 50) // If the debounce of 50 milliseconds has been reached
   {
-    // Write the pixel array red
-    updateColors(maxBrightness, 0 , 0);
-    // Display the pixels on the LED strip
-    strip.sendPixels(numPixels, pixels);
-    // Wait 0.1 seconds
-    delay(50);
-  }
-  if(activeColor == 1)
+    // debounce has been met so it is reset.   
+    buttonDebounce = true;
+  } 
+    ///////////////////////////////////////////////////////
+    // button action handling /////////////////////////////
+  switch (buttonState)
   {
-    // Write the pixel array green
-    updateColors(0, maxBrightness , 0);
-    // Display the pixels on the LED strip
-    strip.sendPixels(numPixels, pixels);
-    // Wait 0.1 seconds
-    delay(50);
+    case 1:
+      // Write the pixel array red
+      updateColors(maxBrightness, 0, 0);
+      // Display the pixels on the LED strip
+      strip.sendPixels(numPixels, pixels);
+      // Wait 0.1 seconds
+      //delay(50);
+      buttonTaskComplete();
+      break;
+    case 2:
+      // Write the pixel array green
+      updateColors(0, maxBrightness, 0);
+      // Display the pixels on the LED strip
+      strip.sendPixels(numPixels, pixels);
+      // Wait 0.1 seconds
+      //delay(50);
+      buttonTaskComplete();
+      break;
+    case 3:
+      // Write the pixel array blue
+      updateColors(0, 0, maxBrightness);
+      // Display the pixels on the LED strip
+      strip.sendPixels(numPixels, pixels);
+      // Wait 0.1 seconds
+      //delay(50);
+      buttonTaskComplete();
+      break;
+    case 4:
+      // Write the pixel array white
+      updateColors(maxBrightness, maxBrightness, 0);
+      // Display the pixels on the LED strip
+      strip.sendPixels(numPixels, pixels);
+      // Wait 0.1 seconds
+      //delay(50);
+      buttonTaskComplete();
+      break;
+    case 5:      
+      // Write the pixel array white
+      updateColors(0, maxBrightness , maxBrightness);
+      // Display the pixels on the LED strip
+      strip.sendPixels(numPixels, pixels);
+      // Wait 0.1 seconds
+      //delay(50);
+      buttonTaskComplete();
   }
-  if(activeColor == 2)
-  {
-    // Write the pixel array blue
-    updateColors(0, 0 , maxBrightness);
-    // Display the pixels on the LED strip
-    strip.sendPixels(numPixels, pixels);
-    // Wait 0.1 seconds
-    delay(50);
-  }
-  if(activeColor == 3)
-  {
-    // Write the pixel array white
-    updateColors(maxBrightness, maxBrightness , 0);
-    // Display the pixels on the LED strip
-    strip.sendPixels(numPixels, pixels);
-    // Wait 0.1 seconds
-    delay(50);
-  }
+    ///////////////////////////////////////////////////////
+    // game draw handling /////////////////////////////////
+  
+    ///////////////////////////////////////////////////////
 }
 
+  // code run after a button activated task is completed /////////////////////////
+void buttonTaskComplete()
+{
+    // Reset the buttonState.
+  buttonState = 0;
+}
+  ////////////////////////////////////////////////////////////////////////////////
+  
+  // decodes analog input into individual button presses /////////////////////////
 void ButtonCheck()
 {
   // read the analog value of the button input pin.
@@ -182,22 +193,36 @@ void ButtonCheck()
   //(The voltage divider between the button resistor and the 10K ground resistor gives the different analog values)
   if(ButtonVal >= 990 && ButtonVal <= 1004) // 330 Ohm (function button)
   {
-    activeColor = 1; // green
+    buttonState = 5; // function button
+    buttonDebounce = false;
   }
   if(ButtonVal >= 940 && ButtonVal <= 980) // 680 Ohm (left button)
   {
-    activeColor = 2; // blue
+    buttonState = 3; // left button
+    buttonDebounce = false;
   }
   if(ButtonVal >= 750 && ButtonVal <= 900) // 2.2 Ohm (down button)
   {
-    activeColor = 0; // red
+    buttonState = 2; // down button
+    buttonDebounce = false;
   }
   if(ButtonVal >= 600 && ButtonVal <= 700) // 4.7 Ohm (up button)
   {
-    activeColor = 1; // green
+    buttonState = 1; // up button
+    buttonDebounce = false;
   }
   if(ButtonVal >= 500 && ButtonVal <= 600) // 10K Ohm (right button)
   {
-    activeColor = 3; // white
+    buttonState = 4; // right button
+    buttonDebounce = false;
   }
+}
+
+void resetGame()
+{
+    // Reset the buttonState.
+  buttonState = 0;
+    // Reset board.
+
+    // Reset win.
 }
