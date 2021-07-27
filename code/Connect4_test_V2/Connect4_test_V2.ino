@@ -88,14 +88,13 @@ bool buttonDebounce = true;
 // connect four variables //////////////////////////////////////////////////////
 // I use uint8_t because it is only one byte and all values will be small unsigned integers.
   // Need to set up with all zeros. Then a red piece can be 1 and a blue piece can be 2. (array[row][column])
-uint8_t gameBoard[7][6] = {
-  {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0}
+uint8_t gameBoard[6][7] = {
+  {2, 1, 0, 0, 0, 0, 0},
+  {0, 0, 1, 0, 0, 0, 0},
+  {0, 0, 2, 0, 0, 0, 0},
+  {0, 0, 1, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0}
 };
   // The position from left to right of the piece currently waiting to drop (range: 0 to 6).
 uint8_t dropPosition = 0;
@@ -104,7 +103,7 @@ uint8_t gameStatus = 0;
   // Stores the game defined state of the button input.
 uint8_t buttonState = 0; // 0 = no input, 1 = up arrow, 2 = down arrow, 3 = left arrow, 4 = right arrow
 ////////////////////////////////////////////////////////////////////////////////
-
+bool pressedTest = false;
 
 void setup()
 {
@@ -121,7 +120,7 @@ void loop()
   {
     ButtonCheck();
     timer = millis();
-  } else if (millis() > timer + 50) // If the debounce of 50 milliseconds has been reached
+  } else if (millis() > timer + 500) // If the debounce of 50 milliseconds has been reached
   {
     // debounce has been met so it is reset.   
     buttonDebounce = true;
@@ -131,42 +130,49 @@ void loop()
   switch (buttonState)
   {
     case 1:
-      // Write the pixel array red
+        // Write the pixel array red
       updateColors(maxBrightness, 0, 0);
-//      // Display the pixels on the LED strip
-//      strip.sendPixels(numPixels, pixels);
-      // task complete
+      LEDchange = true; // LEDs have changed
+        // task complete
       buttonTaskComplete();
       break;
     case 2:
-      // Write the pixel array green
-      updateColors(0, maxBrightness, 0);
-//      // Display the pixels on the LED strip
-//      strip.sendPixels(numPixels, pixels);
-      // task complete
+//        // Write the pixel array green
+//      updateColors(0, maxBrightness, 0);
+        // drop the current hanging piece
+      dropPiece();
+        // task complete
       buttonTaskComplete();
       break;
     case 3:
-      // Write the pixel array blue
-      updateColors(0, 0, maxBrightness);
-//      // Display the pixels on the LED strip
-//      strip.sendPixels(numPixels, pixels);
-      // task complete
+//      // Write the pixel array blue
+//      updateColors(0, 0, maxBrightness);
+        // If the hanging piece is not at the leftmost side
+        // move hanging piece to the left.
+      if (dropPosition > 0)
+      {
+        dropPosition -= 1;
+      }
+        // task complete
       buttonTaskComplete();
       break;
     case 4:
-        // Write the pixel array white
-      updateColors(maxBrightness, maxBrightness, 0);
-//        // Display the pixels on the LED strip
-//      strip.sendPixels(numPixels, pixels);
+//        // Write the pixel array yellow
+//      updateColors(maxBrightness, maxBrightness, maxBrightness);
+        // If the hanging piece is not at the rightmost side
+        // move hanging piece to the right.
+      if (dropPosition < 6)
+      {
+        dropPosition += 1;
+      }
         // task complete
       buttonTaskComplete();
       break;
     case 5:      
-        // Write the pixel array white
-      updateColors(0, maxBrightness , maxBrightness);
-//        // Display the pixels on the LED strip
-//      strip.sendPixels(numPixels, pixels);
+//        // Write the pixel array cyan
+//      updateColors(0, maxBrightness , maxBrightness);
+      convertGameToLightList();
+      LEDchange = true; // LEDs have changed
         // task complete
       buttonTaskComplete();
   }
@@ -178,21 +184,67 @@ void loop()
       // Display the pixels on the LED strip
     strip.sendPixels(numPixels, pixels);
       // reset change
-      LEDchange = false;
+    LEDchange = false;
   }
   ///////////////////////////////////////////////////////
 }
 
-  // code run after a button activated task is completed /////////////////////////
+// code run after a button activated task is completed /////////////////////////
 void buttonTaskComplete()
 {
     // Reset the buttonState.
   buttonState = 0;
-  LEDchange = true;
 }
-  ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+// Sets the array (aka all LEDs) to specified color ////////////////////////////
+void convertGameToLightList()
+{
+  for(uint8_t i = 0; i < 6; i++) // looping through rows
+  {
+    for(uint8_t ii = 0; ii < 7; ii++) // looping through columns
+    {
+        // the position in the pixels array of the LED corresponding to position 
+        // [i][ii] in the game.
+      uint8_t arraySpot = (i * 7) + ii; // will not exceed 42 so uint8_t is fine.
+        // colors the pixel based on game board value. 0 --> green | 1 --> red | 2 --> blue
+      switch (gameBoard[i][ii])
+      {
+        case 0:
+          pixels[arraySpot].r = 0;
+          pixels[arraySpot].g = maxBrightness/2;
+          pixels[arraySpot].b = 0;
+          break;
+        case 1:
+          pixels[arraySpot].r = maxBrightness;
+          pixels[arraySpot].g = 0;
+          pixels[arraySpot].b = 0;
+          break;
+        case 2:
+          pixels[arraySpot].r = 0;
+          pixels[arraySpot].g = 0;
+          pixels[arraySpot].b = maxBrightness;
+          break;
+      }
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+
+// drops hanging piece /////////////////////////////////////////////////////////
+void dropPiece()
+{
+  if (dropPosition == 6){
+    updateColors(0, 0, maxBrightness);
+  } else {
+    updateColors(0, maxBrightness, 0);
+  }
   
-  // decodes analog input into individual button presses /////////////////////////
+  LEDchange = true; // LEDs have changed
+}
+////////////////////////////////////////////////////////////////////////////////
+
+// decodes analog input into individual button presses /////////////////////////
 void ButtonCheck()
 {
   // read the analog value of the button input pin.
@@ -226,11 +278,12 @@ void ButtonCheck()
     buttonDebounce = false;
   }
 }
-
+////////////////////////////////////////////////////////////////////////////////
+// resets the game /////////////////////////////////////////////////////////////
 void resetGame()
 {
     // Reset the buttonState.
   buttonState = 0;
     // Reset board.
-
 }
+////////////////////////////////////////////////////////////////////////////////
