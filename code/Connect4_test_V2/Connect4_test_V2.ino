@@ -89,10 +89,10 @@ bool buttonDebounce = true;
 // I use uint8_t because it is only one byte and all values will be small unsigned integers.
   // Need to set up with all zeros. Then a red piece can be 1 and a blue piece can be 2. (array[row][column])
 uint8_t gameBoard[6][7] = {
-  {2, 1, 0, 0, 0, 0, 0},
-  {0, 0, 1, 0, 0, 0, 0},
-  {0, 0, 2, 0, 0, 0, 0},
-  {0, 0, 1, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
 };
@@ -169,9 +169,8 @@ void loop()
       buttonTaskComplete();
       break;
     case 5:      
-//        // Write the pixel array cyan
-//      updateColors(0, maxBrightness , maxBrightness);
-      convertGameToLightList();
+        // clear the game board
+      resetGame();
       LEDchange = true; // LEDs have changed
         // task complete
       buttonTaskComplete();
@@ -181,6 +180,8 @@ void loop()
     // if a change has been made update the display
   if (LEDchange)
   {
+      // update the LED control array
+    convertGameToLightList();
       // Display the pixels on the LED strip
     strip.sendPixels(numPixels, pixels);
       // reset change
@@ -194,6 +195,26 @@ void buttonTaskComplete()
 {
     // Reset the buttonState.
   buttonState = 0;
+}
+////////////////////////////////////////////////////////////////////////////////
+
+// drops hanging piece /////////////////////////////////////////////////////////
+void dropPiece()
+{
+//  gameBoard[row][column]
+//  dropPosition
+    // For each row checks if there is a piece in the colum of the hanging piece.
+    // When a piece is found (or the bottom is reached) the hanging piece is placed in the lowest open spot.
+  for(uint8_t i = 5; i >= 0; i--) // looping through rows
+  {
+    if (gameBoard[i][dropPosition] == 0)
+    {
+      gameBoard[i][dropPosition] = 1; /////////////////////// need to change to be based on the game status /////////////////////////////////
+      break;
+    }
+  }
+  
+  LEDchange = true; // LEDs have changed
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -228,19 +249,6 @@ void convertGameToLightList()
       }
     }
   }
-}
-////////////////////////////////////////////////////////////////////////////////
-
-// drops hanging piece /////////////////////////////////////////////////////////
-void dropPiece()
-{
-  if (dropPosition == 6){
-    updateColors(0, 0, maxBrightness);
-  } else {
-    updateColors(0, maxBrightness, 0);
-  }
-  
-  LEDchange = true; // LEDs have changed
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -285,5 +293,12 @@ void resetGame()
     // Reset the buttonState.
   buttonState = 0;
     // Reset board.
+  for(uint8_t i = 0; i < 6; i++) // looping through rows
+  {
+    for(uint8_t ii = 0; ii < 7; ii++) // looping through columns
+    {
+      gameBoard[i][ii] = 0;
+    }
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////
