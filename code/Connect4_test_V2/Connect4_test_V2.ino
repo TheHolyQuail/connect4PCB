@@ -48,11 +48,15 @@ const uint8_t maxBrightness = 16;
 
   // The pixel array to display
 grb  pixels[numPixels] = {};
+  
+//char activeColor = 0;
 
-char activeColor = 0;
+  // whether the LED array needs to be updated
+bool LEDchange = true;
+
 ////////////////////////////////////////////////////////////////////////////////
 
-// Sets the array to specified color ///////////////////////////////////////////
+// Sets the array (aka all LEDs) to specified color ////////////////////////////
 void updateColors(char r, char g, char b)
 {
   for(int i = 0; i < numPixels; i++)
@@ -104,13 +108,15 @@ uint8_t buttonState = 0; // 0 = no input, 1 = up arrow, 2 = down arrow, 3 = left
 
 void setup()
 {
+    // reset the LEDs
   strip.clear(2 * numPixels);
+    // setup the pin for button inputs
   pinMode(analogpin, INPUT);
 }
 
 void loop()
 {
-    // button press handling //////////////////////////////////
+  // button press handling //////////////////////////////
   if (millis() != timer && buttonDebounce) // If we have gone on to the next millisecond and have no debounce needs.
   {
     ButtonCheck();
@@ -120,59 +126,61 @@ void loop()
     // debounce has been met so it is reset.   
     buttonDebounce = true;
   } 
-    ///////////////////////////////////////////////////////
-    // button action handling /////////////////////////////
+  ///////////////////////////////////////////////////////
+  // button action handling /////////////////////////////
   switch (buttonState)
   {
     case 1:
       // Write the pixel array red
       updateColors(maxBrightness, 0, 0);
-      // Display the pixels on the LED strip
-      strip.sendPixels(numPixels, pixels);
-      // Wait 0.1 seconds
-      //delay(50);
+//      // Display the pixels on the LED strip
+//      strip.sendPixels(numPixels, pixels);
+      // task complete
       buttonTaskComplete();
       break;
     case 2:
       // Write the pixel array green
       updateColors(0, maxBrightness, 0);
-      // Display the pixels on the LED strip
-      strip.sendPixels(numPixels, pixels);
-      // Wait 0.1 seconds
-      //delay(50);
+//      // Display the pixels on the LED strip
+//      strip.sendPixels(numPixels, pixels);
+      // task complete
       buttonTaskComplete();
       break;
     case 3:
       // Write the pixel array blue
       updateColors(0, 0, maxBrightness);
-      // Display the pixels on the LED strip
-      strip.sendPixels(numPixels, pixels);
-      // Wait 0.1 seconds
-      //delay(50);
+//      // Display the pixels on the LED strip
+//      strip.sendPixels(numPixels, pixels);
+      // task complete
       buttonTaskComplete();
       break;
     case 4:
-      // Write the pixel array white
+        // Write the pixel array white
       updateColors(maxBrightness, maxBrightness, 0);
-      // Display the pixels on the LED strip
-      strip.sendPixels(numPixels, pixels);
-      // Wait 0.1 seconds
-      //delay(50);
+//        // Display the pixels on the LED strip
+//      strip.sendPixels(numPixels, pixels);
+        // task complete
       buttonTaskComplete();
       break;
     case 5:      
-      // Write the pixel array white
+        // Write the pixel array white
       updateColors(0, maxBrightness , maxBrightness);
-      // Display the pixels on the LED strip
-      strip.sendPixels(numPixels, pixels);
-      // Wait 0.1 seconds
-      //delay(50);
+//        // Display the pixels on the LED strip
+//      strip.sendPixels(numPixels, pixels);
+        // task complete
       buttonTaskComplete();
   }
-    ///////////////////////////////////////////////////////
-    // game draw handling /////////////////////////////////
-  
-    ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
+  // game draw handling /////////////////////////////////
+    // if a change has been made update the display
+  if (LEDchange)
+  {
+      // Display the pixels on the LED strip
+    strip.sendPixels(numPixels, pixels);
+      // reset change
+      LEDchange = false;
+  }
+  ///////////////////////////////////////////////////////
 }
 
   // code run after a button activated task is completed /////////////////////////
@@ -180,6 +188,7 @@ void buttonTaskComplete()
 {
     // Reset the buttonState.
   buttonState = 0;
+  LEDchange = true;
 }
   ////////////////////////////////////////////////////////////////////////////////
   
@@ -224,5 +233,4 @@ void resetGame()
   buttonState = 0;
     // Reset board.
 
-    // Reset win.
 }
