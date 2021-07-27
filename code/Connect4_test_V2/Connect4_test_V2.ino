@@ -149,25 +149,28 @@ void loop()
       buttonTaskComplete();
       break;
     case 3:
-        // If the hanging piece is not at the leftmost side
         // move hanging piece to the left.
-      if (dropPosition > 0)
-      {
-          // Move hanging piece to the right.
-        dropPosition -= 1;
-        LEDchange = true; // LEDs have changed
-      }
+      moveHangingPiece(false);
+//        // If the hanging piece is not at the leftmost side
+//      if (dropPosition > 0)
+//      {
+//          // Move hanging piece to the right.
+//        dropPosition -= 1;
+//        LEDchange = true; // LEDs have changed
+//      }
         // task complete
       buttonTaskComplete();
       break;
     case 4:
-        // If the hanging piece is not at the rightmost side.
-      if (dropPosition < 6)
-      {
-          // Move hanging piece to the right.
-        dropPosition += 1;
-        LEDchange = true; // LEDs have changed
-      }
+        // Move hanging piece to the right.
+      moveHangingPiece(true);
+//        // If the hanging piece is not at the rightmost side.
+//      if (dropPosition < 6)
+//      {
+//          // Move hanging piece to the right.
+//        dropPosition += 1;
+//        LEDchange = true; // LEDs have changed
+//      }
         // task complete
       buttonTaskComplete();
       break;
@@ -255,31 +258,50 @@ void buttonTaskComplete()
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-// update the haning piece visual representation ///////////////////////////////
-//void hangingHandler()
-//{
-//    // Turn of any ghost hanging LEDs at previous position.
-//  if (dropPosition != previousDropPosition)
-//  {
-//      // Set previous srop position to 0.
-//    gameBoard[0][previousDropPosition] = 0;
-//      // Set previous drop position to current drop position.
-//    previousDropPosition = dropPosition;
-//  }
-//    // lights up the hanging LED in it's current spot
-//  if(hangBlinkOn)
-//  {
-//    if(gameStatus == 1)
-//    {
-//      gameBoard[0][dropPosition] = 1;
-//    } else if (gameStatus == 2)
-//    {
-//      gameBoard[0][dropPosition] = 2;
-//    }
-//  } else {
-//    gameBoard[0][dropPosition] = 0;
-//  }
-//}
+// Move the hanging piece.  ////////////////////////////////////////////////////
+  // Takes one imput telling it which way to move.
+void moveHangingPiece(bool moveRight)
+{
+    // Move the piece to the right if possible:
+  if (moveRight)
+  {
+      // If the hanging piece is not at the rightmost side.
+    if (dropPosition < 6)
+    {
+      for(uint8_t i = dropPosition + 1; i < 7; i++)
+      {
+          // If the spot "i" is open. Move the hanging piece there.
+        if (gameBoard[0][i] == 0)
+        {
+            // Move hanging piece to the right "i" spaces.
+          dropPosition = i;
+          LEDchange = true; // LEDs have changed 
+          break;
+        }
+      }
+//      dropPosition += 1;
+    }
+    // Move the piece to the left if possible:
+  } else
+  {
+      // If the hanging piece is not at the rightmost side.
+    if (dropPosition > 0)
+    {
+      for(uint8_t i = dropPosition - 1; i >= 0; i--)
+      {
+          // If the spot "i" is open. Move the hanging piece there.
+        if (gameBoard[0][i] == 0)
+        {
+            // Move hanging piece to the right "i" spaces.
+          dropPosition = i;
+          LEDchange = true; // LEDs have changed 
+          break;
+        }
+      }  
+//      dropPosition -= 1;
+    }
+  }
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 // drops hanging piece /////////////////////////////////////////////////////////
