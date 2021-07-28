@@ -44,7 +44,7 @@ ws2812b<D,0>  strip;
 const uint8_t numPixels = 43;
 
   // How bright the LEDs will be (max 255)
-const uint8_t maxBrightness = 16;
+const uint8_t maxBrightness = 10;
 
   // The pixel array to display
 grb  pixels[numPixels] = {};
@@ -69,16 +69,16 @@ void updateColors(char r, char g, char b)
 // button input variables //////////////////////////////////////////////////////
   // Analog pin to read the buttons.
 int analogpin = A3;
-  // How many times we have seen new value.
-int counter = 0;
+//  // How many times we have seen new value.
+//int counter = 0;
   // The last time the output pin was sampled.
 long timer = 0;
   // Number of millis/samples to consider before declaring a debounced input.
-int debounce_count = 50;
-  // The debounced input value.
-int current_state = 0;
+int16_t debounce_count = 50;
+//  // The debounced input value.
+//int current_state = 0;
   // Stores the current analog value on the button input pin.
-int ButtonVal;
+int16_t ButtonVal;
   // whether the code is ready for a new button input
 bool buttonDebounce = true;
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ void loop()
   {
     case 1:
         // Write the pixel array red
-      updateColors(maxBrightness, 0, 0);
+      //updateColors(maxBrightness, 0, 0);
       LEDchange = true; // LEDs have changed
         // task complete
       buttonTaskComplete();
@@ -151,26 +151,12 @@ void loop()
     case 3:
         // move hanging piece to the left.
       moveHangingPiece(false);
-//        // If the hanging piece is not at the leftmost side
-//      if (dropPosition > 0)
-//      {
-//          // Move hanging piece to the right.
-//        dropPosition -= 1;
-//        LEDchange = true; // LEDs have changed
-//      }
         // task complete
       buttonTaskComplete();
       break;
     case 4:
         // Move hanging piece to the right.
       moveHangingPiece(true);
-//        // If the hanging piece is not at the rightmost side.
-//      if (dropPosition < 6)
-//      {
-//          // Move hanging piece to the right.
-//        dropPosition += 1;
-//        LEDchange = true; // LEDs have changed
-//      }
         // task complete
       buttonTaskComplete();
       break;
@@ -217,7 +203,8 @@ void loop()
     } else 
     {
       pixels[dropPosition].r = 0;
-      pixels[dropPosition].g = maxBrightness/2;
+//      pixels[dropPosition].g = maxBrightness/2;
+      pixels[dropPosition].g = 0;
       pixels[dropPosition].b = 0;
     }
 //      // Update status LED.
@@ -371,7 +358,8 @@ void convertGameToLightList()
       {
         case 0:
           pixels[arraySpot].r = 0;
-          pixels[arraySpot].g = maxBrightness/2;
+//          pixels[arraySpot].g = maxBrightness/2;
+          pixels[arraySpot].g = 0;
           pixels[arraySpot].b = 0;
           break;
         case 1:
