@@ -196,9 +196,9 @@ void loop()
         pixels[dropPosition].b = 0;
       } else if (gameStatus == 2)
       {
-        pixels[dropPosition].r = 0;
-        pixels[dropPosition].g = 0;
-        pixels[dropPosition].b = maxBrightness;
+        pixels[dropPosition].r = maxBrightness;
+        pixels[dropPosition].g = 8; // could also be maxBrightness - 2
+        pixels[dropPosition].b = 0;
       }
     } else 
     {
@@ -216,9 +216,9 @@ void loop()
       pixels[42].b = 0;
     } else if (gameStatus == 2)
     {
-      pixels[42].r = 0;
-      pixels[42].g = 0;
-      pixels[42].b = maxBrightness;
+      pixels[42].r = maxBrightness;
+      pixels[42].g = 8; // could also be maxBrightness - 2
+      pixels[42].b = 0;
     } else 
     {
       pixels[42].r = 0;
@@ -368,9 +368,9 @@ void convertGameToLightList()
           pixels[arraySpot].b = 0;
           break;
         case 2:
-          pixels[arraySpot].r = 0;
-          pixels[arraySpot].g = 0;
-          pixels[arraySpot].b = maxBrightness;
+          pixels[arraySpot].r = maxBrightness;
+          pixels[arraySpot].g = 8; // could also be maxBrightness - 2
+          pixels[arraySpot].b = 0;
           break;
       }
     }
