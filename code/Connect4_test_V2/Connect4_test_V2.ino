@@ -47,19 +47,6 @@ grb  pixels[numPixels] = {};
 
   // whether the LED array needs to be updated
 bool LEDchange = true;
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Sets the array (aka all LEDs) to specified color ////////////////////////////
-void updateColors(char r, char g, char b)
-{
-  for(int i = 0; i < numPixels; i++)
-  {
-    pixels[i].r = r;
-    pixels[i].g = g;
-    pixels[i].b = b;
-  }
-}
 ////////////////////////////////////////////////////////////////////////////////
 
 // button input variables //////////////////////////////////////////////////////
@@ -133,7 +120,8 @@ void loop()
   {
     case 1:
         // Write the pixel array red
-      //updateColors(maxBrightness, 0, 0);
+      // This button does nothing and is included primarily 
+      //to allow more complex games to be programed into the board.
       LEDchange = true; // LEDs have changed
         // task complete
       buttonTaskComplete();
