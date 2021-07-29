@@ -33,10 +33,6 @@ July 24, 2021
   // RGB LED library
 #include <FAB_LED.h>
 
-  // Requires headers for AVR defines and ISR function
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
   // Declare the LED protocol and the port
 ws2812b<D,0>  strip;
 
