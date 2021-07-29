@@ -52,14 +52,10 @@ bool LEDchange = true;
 // button input variables //////////////////////////////////////////////////////
   // Analog pin to read the buttons.
 int analogpin = A3;
-//  // How many times we have seen new value.
-//int counter = 0;
   // The last time the output pin was sampled.
 long timer = 0;
   // Number of millis/samples to consider before declaring a debounced input.
 int16_t debounce_count = 50;
-//  // The debounced input value.
-//int current_state = 0;
   // Stores the current analog value on the button input pin.
 int16_t ButtonVal;
   // whether the code is ready for a new button input
@@ -106,7 +102,7 @@ void loop()
   // button press handling //////////////////////////////
   if (millis() != timer && buttonDebounce) // If we have gone on to the next millisecond and have no debounce needs.
   {
-    ButtonCheck();
+    buttonCheck();
     timer = millis();
       // If the debounce of 500 milliseconds has been reached.
   } else if (millis() > timer + 500)
@@ -134,13 +130,13 @@ void loop()
       break;
     case 3:
         // move hanging piece to the left.
-      moveHangingPiece(false);
+      playerMoveHangingPiece(false);
         // task complete
       buttonTaskComplete();
       break;
     case 4:
         // Move hanging piece to the right.
-      moveHangingPiece(true);
+      playerMoveHangingPiece(true);
         // task complete
       buttonTaskComplete();
       break;
@@ -187,7 +183,6 @@ void loop()
     } else 
     {
       pixels[dropPosition].r = 0;
-//      pixels[dropPosition].g = maxBrightness/2;
       pixels[dropPosition].g = 0;
       pixels[dropPosition].b = 0;
     }
@@ -231,7 +226,7 @@ void buttonTaskComplete()
 
 // Move the hanging piece.  ////////////////////////////////////////////////////
   // Takes one imput telling it which way to move.
-void moveHangingPiece(bool moveRight)
+void playerMoveHangingPiece(bool moveRight)
 {
     // Move the piece to the right if possible:
   if (moveRight)
@@ -250,7 +245,6 @@ void moveHangingPiece(bool moveRight)
           break;
         }
       }
-//      dropPosition += 1;
     }
     // Move the piece to the left if possible:
   } else
@@ -269,7 +263,6 @@ void moveHangingPiece(bool moveRight)
           break;
         }
       }  
-//      dropPosition -= 1;
     }
   }
 }
@@ -326,6 +319,7 @@ void moveHangingPiece()
     }
   }
 }
+////////////////////////////////////////////////////////////////////////////////
 
 // Sets the array (aka all LEDs) to specified color ////////////////////////////
 void convertGameToLightList()
@@ -342,7 +336,6 @@ void convertGameToLightList()
       {
         case 0:
           pixels[arraySpot].r = 0;
-//          pixels[arraySpot].g = maxBrightness/2;
           pixels[arraySpot].g = 0;
           pixels[arraySpot].b = 0;
           break;
@@ -363,7 +356,7 @@ void convertGameToLightList()
 ////////////////////////////////////////////////////////////////////////////////
 
 // decodes analog input into individual button presses /////////////////////////
-void ButtonCheck()
+void buttonCheck()
 {
   // read the analog value of the button input pin.
   ButtonVal = analogRead(analogpin);
